@@ -8,7 +8,7 @@ my $builder = Module::Build->new(
     dist_version_from   => 'lib/Bot/MetaSyntactic.pm',
     script_files        => [ 'script/metabot' ], 
     requires => {
-        'Acme::MetaSyntactic' => 0,
+        'Acme::MetaSyntactic' => '0.12',
         'Test::More' => 0,
     },
     add_to_cleanup      => [ 'Bot-MetaSyntactic-*' ],

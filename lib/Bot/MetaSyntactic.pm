@@ -2,9 +2,11 @@ package Bot::MetaSyntactic;
 use strict;
 use Acme::MetaSyntactic;
 use Bot::BasicBot;
+use Carp;
+use Text::Wrap;
 
 { no strict;
-  $VERSION = '0.01';
+  $VERSION = '0.02';
   @ISA = qw(Bot::BasicBot);
 }
 
@@ -14,7 +16,7 @@ Bot::MetaSyntactic - IRC frontend to Acme::MetaSyntactic
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 
@@ -35,6 +37,28 @@ the module C<Acme::MetaSyntactic>.
 =head1 FUNCTIONS
 
 =over 4
+
+=item init()
+
+Initializes private data.
+
+=cut
+
+sub init {
+    my $self = shift;
+
+    $self->{meta} = {
+        obj   => undef, 
+        limit => 100, 
+        wrap  => 256, 
+    };
+    
+    $Text::Wrap::columns = $self->{meta}{wrap};
+
+    $self->{meta}{obj} = new Acme::MetaSyntactic 
+      or croak "fatal: Can't create new Acme::MetaSyntactic object"
+      and return undef;
+}
 
 =item said()
 
@@ -57,11 +81,20 @@ sub said {
     {
       $args->{body} =~ s/(\d+)//;
       $number = $1 || 1;
+      $number = $self->{meta}{limit} if $number > $self->{meta}{limit};
     }
 
     {
       $args->{body} =~ s/(\w+)//;
-      $theme = $1 || $Acme::MetaSyntactic::Theme;
+      $theme = $1 || 'any';
+    }
+
+    if($theme eq 'version') {
+        $args->{body} = sprintf "%s IRC bot, using %s", $self->nick, join ', ', map {
+            $_ . ' ' . $_->VERSION
+        } qw(Acme::MetaSyntactic Bot::BasicBot Bot::MetaSyntactic POE POE::Component::IRC);
+        $self->say($args);
+        return undef;
     }
 
     if($theme eq 'themes') {
@@ -70,14 +103,13 @@ sub said {
         return undef;
     }
     
-    unless(exists $Acme::MetaSyntactic::META{$theme}) {
+    unless(Acme::MetaSyntactic->has_theme($theme)) {
         $args->{body} = "No such theme: $theme";
         $self->say($args);
         return undef;
     }
 
-    my $meta = Acme::MetaSyntactic->new($theme);
-    $args->{body} = join ' ', $meta->name($number);
+    $args->{body} = join ' ', wrap('', '', $self->{meta}{obj}->name($theme => $number));
     $self->say($args);
 
     return undef
@@ -109,9 +141,25 @@ Called with a theme name, print this number of random words from this theme.
 
 Called with C<themes>, print all available themes. 
 
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Can't create new %s object
+
+B<(F)> Occurs in C<init()>. As the message says, we were unable to create 
+a new object of the given class. 
+
+=back
+
+=head1 SEE ALSO
+
+L<Bot::BasicBot>
+
 =head1 AUTHOR
 
-SE<eacute>bastien Aperghis-Tramoni, C<< <sebastien@aperghis.net> >>
+SE<eacute>bastien Aperghis-Tramoni, E<lt>sebastien@aperghis.netE<gt>
 
 =head1 BUGS
 

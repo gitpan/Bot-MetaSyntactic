@@ -5,8 +5,10 @@ META.yml
 Makefile.PL
 README
 lib/Bot/MetaSyntactic.pm
+script/metabot
 t/00load.t
 t/00prereq.t
+t/01api.t
 t/distchk.t
 t/podcover.t
 t/pod.t

@@ -1,5 +1,6 @@
 use strict;
 use ExtUtils::MakeMaker;
+eval'use ExtUtils::MakeMaker::Coverage';
 
 WriteMakefile(
     NAME                => 'Bot::MetaSyntactic',
@@ -9,7 +10,7 @@ WriteMakefile(
     EXE_FILES           => [ 'script/metabot' ], 
     PL_FILES            => {},
     PREREQ_PM => {
-        'Acme::MetaSyntactic' => 0,
+        'Acme::MetaSyntactic' => '0.12',
         'Test::More' => 0,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
