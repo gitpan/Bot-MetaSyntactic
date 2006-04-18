@@ -3,10 +3,11 @@ use strict;
 use Acme::MetaSyntactic;
 use Bot::BasicBot;
 use Carp;
+use I18N::LangTags qw(extract_language_tags);
 use Text::Wrap;
 
 { no strict;
-  $VERSION = '0.02';
+  $VERSION = '0.03';
   @ISA = qw(Bot::BasicBot);
 }
 
@@ -16,7 +17,7 @@ Bot::MetaSyntactic - IRC frontend to Acme::MetaSyntactic
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 
@@ -56,7 +57,7 @@ sub init {
     $Text::Wrap::columns = $self->{meta}{wrap};
 
     $self->{meta}{obj} = new Acme::MetaSyntactic 
-      or croak "fatal: Can't create new Acme::MetaSyntactic object"
+      or carp "fatal: Can't create new Acme::MetaSyntactic object" 
       and return undef;
 }
 
@@ -75,12 +76,15 @@ sub said {
 
     # don't do anything unless directly addressed
     return undef unless $args->{address} eq $self->nick or $args->{channel} eq 'msg';
+    return if $self->ignore_nick($args->{who});
+    return if index($args->{body}, '++') == 0;
+    return if index($args->{body}, '--') == 0;
 
     my @themes = Acme::MetaSyntactic->themes;
 
     {
-      $args->{body} =~ s/(\d+)//;
-      $number = $1 || 1;
+      $args->{body} =~ s/\b(\d+)\b//;
+      $number = defined($1) ? $1 : 1;
       $number = $self->{meta}{limit} if $number > $self->{meta}{limit};
     }
 
@@ -109,7 +113,10 @@ sub said {
         return undef;
     }
 
-    $args->{body} = join ' ', wrap('', '', $self->{meta}{obj}->name($theme => $number));
+    my @words = $self->{meta}{obj}->name($theme => $number);
+    @words = @words[0..$self->{meta}{limit}] if @words > $self->{meta}{limit};
+
+    $args->{body} = join ' ', wrap('', '', @words);
     $self->say($args);
 
     return undef
@@ -155,7 +162,7 @@ a new object of the given class.
 
 =head1 SEE ALSO
 
-L<Bot::BasicBot>
+L<Acme::MetaSyntactic>, L<Bot::BasicBot>
 
 =head1 AUTHOR
 
@@ -164,8 +171,8 @@ SE<eacute>bastien Aperghis-Tramoni, E<lt>sebastien@aperghis.netE<gt>
 =head1 BUGS
 
 Please report any bugs or feature requests to
-L<bug-bot-metasyntactic@rt.cpan.org>, or through the web interface at
-L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Bot-MetaSyntactic>. 
+C<bug-bot-metasyntactic@rt.cpan.org>, or through the web interface at
+L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Bot-MetaSyntactic>. 
 I will be notified, and then you'll automatically be notified 
 of progress on your bug as I make changes.
 

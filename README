@@ -3,9 +3,7 @@ Bot-MetaSyntactic
 
 DESCRIPTION
 
-    This distribution includes a module that provides Babelfish 
-    translation services through an IRC bot. A program eg/babelbot 
-    is included as example.
+    This distribution includes a module that provides 
 
 
 INSTALLATION

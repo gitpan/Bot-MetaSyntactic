@@ -1,15 +1,13 @@
----
-name: Bot-MetaSyntactic
-version: 0.02
-author:
-  - Sébastien Aperghis-Tramoni <sebastien@aperghis.net>
-abstract: IRC frontend to Acme::MetaSyntactic
-license: perl
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Bot-MetaSyntactic
+version:      0.03
+version_from: lib/Bot/MetaSyntactic.pm
+installdirs:  site
 requires:
-  Acme::MetaSyntactic: 0.12
-  Test::More: 0
-provides:
-  Bot::MetaSyntactic:
-    file: lib/Bot/MetaSyntactic.pm
-    version: 0.02
-generated_by: Module::Build version 0.2608
+    Acme::MetaSyntactic:           0.70
+    Bot::BasicBot:                 0.12
+    Test::More:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

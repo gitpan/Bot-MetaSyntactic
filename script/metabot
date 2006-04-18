@@ -3,10 +3,11 @@ use strict;
 use Bot::MetaSyntactic;
 
 Bot::MetaSyntactic->new(
-        nick => 'meta', 
+        nick => 'meta2', 
         name => 'Acme::MetaSyntactic IRC frontend', 
         server => 'irc.perl.org', 
-        channels => ['#perlfr']
+        channels => [qw(#perlfr)],
+        ignore_list => [qw(dipsy purl)],
     )->run
 
 __END__

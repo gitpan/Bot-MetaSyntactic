@@ -3,9 +3,9 @@ use Test::More tests => 10;
 use Bot::MetaSyntactic;
 
 # check that the following functions are available
-ok( defined \&Bot::MetaSyntactic::init ); #01
-ok( defined \&Bot::MetaSyntactic::said ); #02
-ok( defined \&Bot::MetaSyntactic::help ); #03
+ok( exists &Bot::MetaSyntactic::init   ); #01
+ok( exists &Bot::MetaSyntactic::said   ); #02
+ok( exists &Bot::MetaSyntactic::help   ); #03
 
 # create an object
 my $bot = undef;
