@@ -7,7 +7,7 @@ use I18N::LangTags qw(extract_language_tags);
 use Text::Wrap;
 
 { no strict;
-  $VERSION = '0.03';
+  $VERSION = '0.0301';
   @ISA = qw(Bot::BasicBot);
 }
 
@@ -56,7 +56,7 @@ sub init {
     
     $Text::Wrap::columns = $self->{meta}{wrap};
 
-    $self->{meta}{obj} = new Acme::MetaSyntactic 
+    $self->{meta}{obj} = Acme::MetaSyntactic->new 
       or carp "fatal: Can't create new Acme::MetaSyntactic object" 
       and return undef;
 }
@@ -77,6 +77,8 @@ sub said {
     # don't do anything unless directly addressed
     return undef unless $args->{address} eq $self->nick or $args->{channel} eq 'msg';
     return if $self->ignore_nick($args->{who});
+
+    # ignore karma
     return if index($args->{body}, '++') == 0;
     return if index($args->{body}, '--') == 0;
 
@@ -93,21 +95,23 @@ sub said {
       $theme = $1 || 'any';
     }
 
-    if($theme eq 'version') {
-        $args->{body} = sprintf "%s IRC bot, using %s", $self->nick, join ', ', map {
-            $_ . ' ' . $_->VERSION
-        } qw(Acme::MetaSyntactic Bot::BasicBot Bot::MetaSyntactic POE POE::Component::IRC);
+    if ($theme eq 'version') {
+        $args->{body} = sprintf "%s IRC bot, using %s", $self->nick, 
+            join ', ', map { $_ . ' ' . $_->VERSION } qw(
+                Acme::MetaSyntactic  Bot::BasicBot  Bot::MetaSyntactic 
+                POE  POE::Component::IRC
+            );
         $self->say($args);
         return undef;
     }
 
-    if($theme eq 'themes') {
+    if ($theme eq 'themes') {
         $args->{body} = "Available themes: @themes";
         $self->say($args);
         return undef;
     }
     
-    unless(Acme::MetaSyntactic->has_theme($theme)) {
+    unless (Acme::MetaSyntactic->has_theme($theme)) {
         $args->{body} = "No such theme: $theme";
         $self->say($args);
         return undef;
